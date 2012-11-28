@@ -1,8 +1,15 @@
 var users = require(__dirname + '/../config/models').users;
+var page_size = 10;
 
 exports.list = function(req, res){
-  users.findAll().success(function(users) {
-    res.jsonp(users);
+  var page = parseInt(req.query.p) || 0;
+  users.findAll({ offset: (page * page_size), limit: page_size }).success(function(users) {
+    res.jsonp({
+           page: page,
+      page_size: page_size,
+          links: [{ href: 'http://localhost:3000/users?p=' + (page + 1), rel: 'next_page' }],
+         result: users
+    });
   });
 };
 
